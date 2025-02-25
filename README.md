@@ -120,15 +120,12 @@ The simulation environment should look as below:
     <img src="3D_reconstruction.png" alt="3D Reconstruction" width="700">
 </div>
 
-## 🎥 Demonstration Video
 
+## 🎥 Demonstration Video
 A demonstration of the robotic crack measurement system can be seen below:
 
 <div align="center">
-    <video width="700" controls>
-        <source src="results/Final.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+<video src="https://github.com/user-attachments/assets/706ef7f4-40e0-4029-8845-91a721941b05" width="352" height="720"></video>
 </div>
 
 ## 📧 Contact
