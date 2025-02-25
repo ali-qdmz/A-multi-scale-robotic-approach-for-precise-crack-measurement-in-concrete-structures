@@ -1,7 +1,6 @@
 # Multi-Scale Robotic Crack Measurement in Concrete Structures
 
 [![Paper DOI](https://img.shields.io/badge/DOI-10.1016/j.autcon.2023.105215-blue)](https://doi.org/10.1016/j.autcon.2023.105215)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## 📖 Overview
 This repository contains the source code and datasets for the **Multi-Scale Robotic Crack Measurement** approach introduced in the paper:
