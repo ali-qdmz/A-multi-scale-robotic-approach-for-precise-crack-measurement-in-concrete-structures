@@ -126,7 +126,7 @@ A demonstration of the robotic crack measurement system can be seen below:
 
 <div align="center">
     <video width="700" controls>
-        <source src="results/Final" type="video/mp4">
+        <source src="results/Final.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 </div>
