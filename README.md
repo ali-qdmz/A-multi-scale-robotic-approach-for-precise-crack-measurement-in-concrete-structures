@@ -92,7 +92,13 @@ The simulation environment should look as below:
 </div>
 
 
+
 ### 📌 Real World Crack Detection Output
+
+<div align="center">
+    <img src="expremental_setup.png" alt="Crack Detection Example" width="300">
+</div>
+
 <div align="center">
     <img src="crack_res.png" alt="Crack Detection Example" width="700">
 </div>
