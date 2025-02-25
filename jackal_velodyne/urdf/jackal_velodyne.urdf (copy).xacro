@@ -1,0 +1,684 @@
+<?xml version="1.0"?>
+<robot name="jackal" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find ur_description)/urdf/inc/ur_transmissions.xacro" />
+  <xacro:include filename="$(find ur_description)/urdf/inc/ur_common.xacro" />
+
+
+  <xacro:property name="PI" value="3.1415926535897931" />
+
+  <xacro:property name="wheelbase" value="0.262" />
+  <xacro:property name="track" value="0.37559" />
+  <xacro:property name="wheel_vertical_offset" value="0.0345" />
+  <xacro:property name="footprint_vertical_offset" value="-0.0655" />
+
+  <xacro:property name="wheel_radius" value="0.098" />
+  <xacro:property name="wheel_width" value="0.040" />
+
+  <xacro:property name="chassis_length" value="0.420" />
+  <xacro:property name="chassis_width" value="0.310" />
+  <xacro:property name="chassis_height" value="0.184" />
+
+  <xacro:property name="dummy_inertia" value="1e-09"/>
+
+  <xacro:property name="mount_spacing" value="0.120" />
+
+
+
+  <material name="dark_grey"><color rgba="0.2 0.2 0.2 1.0" /></material>
+  <material name="light_grey"><color rgba="0.4 0.4 0.4 1.0" /></material>
+  <material name="yellow"><color rgba="0.8 0.8 0.0 1.0" /></material>
+  <material name="black"><color rgba="0.15 0.15 0.15 1.0" /></material>
+
+
+  
+  <xacro:macro name="wheel" params="prefix *joint_pose">
+
+     
+
+    <link name="${prefix}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+        <geometry>
+          <mesh filename="package://jackal_description/meshes/jackal-wheel.stl"/>
+        </geometry>
+        <material name="black" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.477"/>
+        <inertia
+          ixx="0.0013" ixy="0" ixz="0"
+          iyy="0.0024" iyz="0"
+          izz="0.0013"/>
+      </inertial>
+    </link>
+
+    <gazebo reference="${prefix}_wheel_link">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+    <joint name="${prefix}_wheel" type="continuous">
+      <parent link="chassis_link"/>
+      <child link="${prefix}_wheel_link" />
+      <xacro:insert_block name="joint_pose" />
+      <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- In reality, Jackal has only two motors, one per side. However, it's more
+         straightforward for Gazebo to simulate as if there's an actuator per wheel. -->
+    <transmission name="${prefix}_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_wheel">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${prefix}_actuator">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+
+
+
+    <!--Define constants-->
+    <xacro:property name="link_type" value="cuboidal" />
+    <xacro:property name="M_PI" value="3.14159"/>
+    <xacro:property name="mass_1" value="20" />
+    <xacro:property name="mass_2" value="5" />
+    <xacro:property name="mass_3" value="3" />
+    <xacro:property name="mass_4" value="3" />
+    <xacro:property name="mass_5" value="1" />
+    <xacro:property name="mass_6" value="0.2" />
+    <xacro:property name="radius_1" value="0.1" />  <!--base_link radius-->
+    <xacro:property name="radius_2" value="0.05" /> <!--link_1 radius-->
+    <xacro:property name="radius_3" value="0.035" /><!--link_2 radius-->
+    <xacro:property name="radius_4" value="0.025" /><!--link_3 radius-->
+    <xacro:property name="radius_5" value="0.025" /><!--gripper base redius/width-->
+    <xacro:property name="radius_6" value="0.02" /> <!--finger radius/length-->
+
+    <xacro:property name="length_1" value="0.15" /> <!--base_link length-->
+    <xacro:property name="length_2" value="0.4" />  <!--link_1 length-->
+    <xacro:property name="length_3" value="0.5" />  <!--link_2 length-->
+    <xacro:property name="length_4" value="0.3" /> <!--link_3 length-->
+    <xacro:property name="length_5" value="0.15" /> <!--gripper base length-->
+    <xacro:property name="length_6" value="0.07" /> <!--finger length-->
+    
+    <!--Define Rviz colors-->
+    <material name="Black">
+        <color rgba="0.0 0.0 0.0 1.0"/>
+    </material>
+    <material name="Red">
+        <color rgba="0.8 0.0 0.0 1.0"/>
+    </material>
+    <material name="Blue">
+        <color rgba="0.0 0.0 1.0 1.0"/>
+    </material>
+    <material name="LightBlue">
+        <color rgba="0.589 0.793 1.0 1.0"/>
+    </material>
+    <material name="Grey">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+    </material>
+    <material name="White">
+        <color rgba="1.0 1.0 1.0 1.0"/>
+    </material>
+
+    <!-- macros for inertia -->
+    <xacro:macro name="inertial_block" params="mass length radius">
+        <inertial>
+        <origin xyz="0 0 ${length/2}" rpy="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+            ixx="${mass / 12.0 * (2*radius*2*radius + length*length)}" ixy="0.0" ixz="0.0"
+            iyy="${mass / 12.0 * (length*length + 2*radius*2*radius)}" iyz="0.0"
+            izz="${mass / 12.0 * (2*radius*2*radius + 2*radius*2*radius)}" />
+    </inertial>
+    </xacro:macro>
+
+    <!-- macros for transmission -->
+    <xacro:macro name="transmission_block" params="joint_name">
+	  <transmission name="tran1">
+	    <type>transmission_interface/SimpleTransmission</type>
+	    <joint name="${joint_name}">
+	      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+	    </joint>
+	    <actuator name="motor1">
+	      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+	      <mechanicalReduction>1</mechanicalReduction>
+	    </actuator>
+	  </transmission>
+   </xacro:macro>
+
+    <!--Define Gazebo colors-->
+    <xacro:macro name="gazebo_grey_link_color_block" params="link_name">
+    <gazebo reference="${link_name}">
+    <visual>
+      <material>
+        <ambient>0.5 0.5 0.5 1.0</ambient>
+        <diffuse>0.56666695 0.56666695 0.56666695 1.0</diffuse>
+        <specular>0.6000003 0.6000003 0.6000003 1.0</specular>
+      </material>
+    </visual>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="gazebo_blue_link_color_block" params="link_name">
+    <gazebo reference="${link_name}">
+    <visual>
+      <material>
+        <ambient>0.589 0.793 1.0 1.0</ambient>
+        <diffuse>0.56666695 0.56666695 0.56666695 1.0</diffuse>
+        <specular>0.6000003 0.6000003 0.6000003 1.0</specular>
+      </material>
+    </visual>
+    </gazebo>
+  </xacro:macro>
+
+
+
+  <xacro:wheel prefix="front_left">
+    <origin xyz="${wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+  <xacro:wheel prefix="front_right">
+    <origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+  <xacro:wheel prefix="rear_left">
+    <origin xyz="${-wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+  <xacro:wheel prefix="rear_right">
+    <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+
+  <link name="base_link"></link>
+
+  <joint name="base_link_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="chassis_link" />
+  </joint>
+
+  <link name="chassis_link">
+    <visual>
+      <origin xyz="0 0 ${footprint_vertical_offset}" rpy="${PI/2} 0 ${PI/2}"/>
+      <geometry>
+        <mesh filename="package://jackal_description/meshes/jackal-base.stl"/>
+      </geometry>
+      <material name="dark_grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${chassis_height/2}"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- Center of mass -->
+      <origin xyz="0.012  0.002 0.067" rpy="0 0 0"/>
+      <mass value="16.523"/>
+      <!-- Moments of inertia: ( chassis without wheels ) -->
+      <inertia
+        ixx="0.3136" ixy="-0.0008" ixz="0.0164"
+        iyy="0.3922" iyz="-0.0009"
+        izz="0.4485"/>
+      </inertial>
+  </link>
+
+  <link name="fenders_link">
+    <visual>
+      <origin xyz="0 0 ${footprint_vertical_offset}" rpy="${PI/2} 0 ${PI/2}"/>
+      <geometry>
+        <mesh filename="package://jackal_description/meshes/jackal-fenders.stl"/>
+      </geometry>
+      <material name="yellow" />
+    </visual>
+  </link>
+  <joint name="fenders_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="fenders_link" />
+  </joint>
+
+  <!-- TODO: Make this internal_imu_link or something, and use a mixed-in xacro
+       to supply the joint between it and imu_link. This is important so that imu_link
+       always points to the "active" IMU. When an upgrade IMU is connected, the
+       internal_imu_link should remain, but imu_link should point to the upgrade one. -->
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="${dummy_inertia}" ixy="0.0" ixz="0.0" iyy="${dummy_inertia}" iyz="0.0" izz="${dummy_inertia}"/>
+    </inertial>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="imu_link" />
+  </joint>
+
+  <!-- TODO: Same note as applies to imu_link -->
+  <link name="navsat_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.026" length="0.016" />
+      </geometry>
+      <origin xyz="0 0 0.008" />
+      <material name="black" />
+    </visual>
+  </link>
+  <joint name="navsat_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="navsat_link" />
+    <origin xyz="-0.180 0.126 0.1815" />
+  </joint>
+
+  <link name="mid_mount"></link>
+  <joint name="mid_mount_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="mid_mount" />
+    <origin xyz="0 0 ${chassis_height}" />
+  </joint>
+
+  <link name="rear_mount"></link>
+  <joint name="rear_mount_joint" type="fixed">
+    <parent link="mid_mount" />
+    <child link="rear_mount" />
+    <origin xyz="${-mount_spacing} 0 0" />
+  </joint>
+
+  <link name="front_mount"></link>
+  <joint name="front_mount_joint" type="fixed">
+    <parent link="mid_mount" />
+    <child link="front_mount" />
+    <origin xyz="${mount_spacing} 0 0" />
+  </joint>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- Bring in simulation data for Gazebo. -->
+  <xacro:include filename="$(find jackal_description)/urdf/jackal.gazebo" />
+
+  <!-- Optional standard accessories, including their simulation data. The rendering
+       of these into the final description is controlled by optenv variables, which
+       default each one to off.-->
+  <xacro:include filename="$(find jackal_description)/urdf/accessories.urdf.xacro" />
+
+  <!-- Optional custom includes. -->
+  <!-- <xacro:if value="$(optenv JACKAL_URDF_EXTRAS 0)">
+    <xacro:include filename="$(env JACKAL_URDF_EXTRAS)" />
+  </xacro:if> -->
+
+
+
+
+
+
+
+
+  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+  <xacro:VLP-16 parent="base_link" name="velodyne" topic="/velodyne_points" organize_cloud="$false" hz="10" samples="440" gpu="false">
+    <origin xyz="0 0 0.4" rpy="0 0 0" />
+  </xacro:VLP-16>
+
+  <!-- <xacro:include filename="$(find velodyne_description)/urdf/HDL-32E.urdf.xacro"/>
+  <xacro:HDL-32E parent="base_link" name="velodyne2" topic="/velodyne_points2" organize_cloud="false" hz="10" samples="220" gpu="false">
+    <origin xyz="0 0 0.6" rpy="0 0 0" />
+  </xacro:HDL-32E> -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <joint name="joint_1" type="revolute">
+        <origin xyz="0.0 0.0 ${length_1}" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="link_1"/>
+        <axis xyz="0.0 0.0 1"/>
+        <limit lower="0.0" upper="${M_PI * 2}" effort="300.0" velocity="1.0"/>
+    </joint>
+
+    <!--=============================================================================-->
+    <!--link_1-->
+    <link name="link_1">
+        <xacro:inertial_block mass="${mass_2}" length="${length_2}" radius="${radius_2}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${length_2/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_2}" length="${length_2}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${length_2/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_2}" length="${length_2}"/>
+            </geometry>
+        </collision>
+    </link>
+    
+    <xacro:gazebo_grey_link_color_block link_name="link_1"/>
+    <!-- <xacro:gazebo_grey_link_color_block link_name="link_1"> -->
+    
+    <link name="link_1_endlink">
+        <xacro:inertial_block mass="${mass_2/3.0}" length="${2*radius_2+2*radius_3}" radius="${radius_2}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${(2*radius_2+2*radius_3)/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_2*1.1}" length="${2*radius_2+2*radius_3}"/>
+            </geometry>
+            <material name="LightBlue"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${(2*radius_2+2*radius_3)/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_2*1.1}" length="${2*radius_2+2*radius_3}"/>
+            </geometry>
+        </collision>
+
+    </link>
+
+
+    <xacro:gazebo_blue_link_color_block link_name="link_1_endlink"/>
+
+
+
+    <joint name="link_1_endjoint" type="fixed">
+        <origin xyz="${-radius_2} 0.0 ${length_2 - 0.01}" rpy="0.0 ${M_PI/2.0} 0.0"/>
+        <parent link="link_1"/>
+        <child link="link_1_endlink"/>
+    </joint>
+
+    <gazebo reference="link_1_endjoint">
+        <disableFixedJointLumping>true</disableFixedJointLumping> 
+        <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <joint name="joint_2" type="revolute">
+        <origin xyz="${radius_2 + radius_3} 0.0 ${length_2}" rpy="0.0 0.0 0.0"/>
+        <parent link="link_1"/>
+        <child link="link_2"/>
+        <axis xyz="1.0 0.0 0.0"/>
+        <limit lower="0.0" upper="${M_PI * 2}" effort="300.0" velocity="1.0"/>
+    </joint>
+
+    <!--=============================================================================-->
+    <!--link_2-->
+    <link name="link_2">
+        <xacro:inertial_block mass="${mass_3}" length="${length_3}" radius="${radius_3}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${length_3/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_3}" length="${length_3}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${length_3/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_3}" length="${length_3}"/>
+            </geometry>>
+        </collision>
+    </link>
+
+    <xacro:gazebo_grey_link_color_block link_name="link_2"/>
+
+    <link name="link_2_endlink">
+        <xacro:inertial_block mass="${mass_3/3.0}" length="${2*radius_3+2*radius_4}" radius="${radius_3}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${(2*radius_3+2*radius_4)/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_3*1.1}" length="${2*radius_3+2*radius_4}"/>
+            </geometry>
+            <material name="LightBlue"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${(2*radius_3+2*radius_4)/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_3*1.1}" length="${2*radius_3+2*radius_4}"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <xacro:gazebo_blue_link_color_block link_name="link_2_endlink"/>
+
+    <joint name="link_2_endjoint" type="fixed">
+        <origin xyz="${-radius_3} 0.0 ${length_3 - 0.01}" rpy="0.0 ${M_PI/2.0} 0.0"/>
+        <parent link="link_2"/>
+        <child link="link_2_endlink"/>
+    </joint>
+
+    <gazebo reference="link_2_endjoint">
+        <disableFixedJointLumping>true</disableFixedJointLumping> 
+        <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <joint name="joint_3" type="revolute">
+        <origin xyz="${radius_3 + radius_4} 0.0 ${length_3 - radius_3}" rpy="0.0 0.0 0.0"/>
+        <parent link="link_2"/>
+        <child link="link_3"/>
+        <axis xyz="1.0 0.0 0.0"/>
+        <limit lower="0.0" upper="${M_PI * 2}" effort="300.0" velocity="1.0"/>
+    </joint>
+
+    <!--=============================================================================-->
+    <!--link_3-->
+    <link name="link_3">
+        <xacro:inertial_block mass="${mass_4}" length="${length_4}" radius="${radius_4}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${length_4/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_4}" length="${length_4}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${length_4/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <cylinder radius="${radius_4}" length="${length_4}"/>
+            </geometry>>
+        </collision>
+    </link>
+
+    <xacro:gazebo_grey_link_color_block link_name="link_3"/>
+
+    <joint name="joint_4" type="revolute">
+        <origin xyz="0.0 0.0 ${length_4}" rpy="0.0 0.0 0.0"/>
+        <parent link="link_3"/>
+        <child link="link_4"/>
+        <axis xyz="0.0 0.0 01.0"/>
+        <limit lower="0.0" upper="${M_PI * 2}" effort="300.0" velocity="1.0"/>
+    </joint>
+
+    <!--=============================================================================-->
+    <!--link_4-->
+    <link name="link_4">
+        <xacro:inertial_block mass="${mass_5}" length="${length_5}" radius="${radius_5}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${radius_5/2.0}" rpy="0.0 ${M_PI/2.0} 0.0"/>
+            <geometry>
+                <box size="${radius_5*2} ${radius_5*2} ${length_5}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${radius_5/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${radius_5*2} ${radius_5*2} ${length_5}"/>
+            </geometry>>
+        </collision>
+    </link>
+
+    <xacro:gazebo_grey_link_color_block link_name="link_4"/>
+
+    <joint name="gripper_joint_1" type="prismatic">
+        <origin xyz="0.0 0.0 ${radius_5 + length_6/2.0}" rpy="0.0 0.0 0.0"/>
+        <parent link="link_4"/>
+        <child link="gripper_link_1"/>
+        <axis xyz="1.0 0.0 0.0"/>
+        <limit lower="${radius_6/2.0}" upper="0.05" effort="100.0" velocity="1.0"/>
+    </joint>
+
+    <joint name="gripper_joint_2" type="prismatic">
+        <origin xyz="0.0 0.0 ${radius_5 + length_6/2.0}" rpy="0.0 0.0 0.0"/>
+        <parent link="link_4"/>
+        <child link="gripper_link_2"/>
+        <axis xyz="1.0 0.0 0.0"/>
+        <limit lower="-0.05" upper="${-radius_6/2.0}" effort="100.0" velocity="1.0"/>
+    </joint>
+
+    <joint name="gripper_frame_joint" type="fixed">
+        <origin xyz="0.0 0.0 ${radius_5*2 + length_6/2 + 0.01}" rpy="0.0 0.0 0.0"/>
+        <parent link="link_4"/>
+        <child link="gripper_frame_cp"/>
+    </joint>
+    <!--=============================================================================-->
+    <!--gripper_link_1-->
+    <link name="gripper_link_1">
+        <xacro:inertial_block mass="${mass_6}" length="${length_6}" radius="${radius_6}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${radius_6/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${radius_6} ${radius_6*2} ${length_6}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${radius_6/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${radius_6*2} ${radius_6*2} ${length_6}"/>
+            </geometry>>
+        </collision>
+    </link>
+
+    <xacro:gazebo_grey_link_color_block link_name="gripper_link_1"/>
+
+    <!--=============================================================================-->
+    <!--gripper_link_2-->
+    <link name="gripper_link_2">
+        <xacro:inertial_block mass="${mass_6}" length="${length_6}" radius="${radius_6}"/>
+        <visual>
+            <origin xyz="0.0 0.0 ${radius_6/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${radius_6} ${radius_6*2} ${length_6}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 ${radius_6/2.0}" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${radius_6*2} ${radius_6*2} ${length_6}"/>
+            </geometry>>
+        </collision>
+    </link>
+
+    <xacro:gazebo_grey_link_color_block link_name="gripper_link_2"/>
+    <!--=============================================================================-->
+    <!--gripper_frame_cp-->
+    <link name="gripper_frame_cp">
+        <xacro:inertial_block mass="${0.001}" length="${0.001}" radius="${0.001}"/>
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${0.001} ${0.001} ${0.001}"/>
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="${0.001} ${0.001} ${0.001}"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Transmissions for ros control -->
+    <xacro:transmission_block joint_name="joint_1"/>
+    <xacro:transmission_block joint_name="joint_2"/>
+    <xacro:transmission_block joint_name="joint_3"/>
+    <xacro:transmission_block joint_name="joint_4"/>
+    <xacro:transmission_block joint_name="gripper_joint_1"/>
+    <xacro:transmission_block joint_name="gripper_joint_2"/>
+
+    <!-- ros_control plugin -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/rrr_arm</robotNamespace>
+        </plugin>
+    </gazebo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+</robot>

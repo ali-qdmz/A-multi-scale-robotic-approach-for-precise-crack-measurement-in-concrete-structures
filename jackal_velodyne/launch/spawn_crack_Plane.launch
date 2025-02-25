@@ -1,0 +1,5 @@
+<launch>
+  <param command="$(find xacro)/xacro --inorder '$(find jackal_velodyne)/urdf/crack_Plane.urdf.xacro'" name="crack_Plane_description" />
+
+  <node args="-param crack_Plane_description -urdf -model crack_Plane" name="spawn_crack_Plane" pkg="gazebo_ros" respawn="false" type="spawn_model" />
+</launch>
