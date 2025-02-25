@@ -47,9 +47,9 @@ source devel/setup.sh
 ```
 ### 2️⃣ ROS Package Setup
 
-Run the robotic inspection:
+Run the robotic inspection using the bash script provided
 ```bash
-roslaunch ur_gazebo ur3_bringup.launch
+./script.sh
 ```
 
 ### 3️⃣ Running the CNN Model
