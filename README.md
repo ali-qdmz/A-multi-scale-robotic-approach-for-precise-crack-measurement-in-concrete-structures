@@ -104,8 +104,6 @@ The simulation environment should look as below:
     <img src="3D_reconstruction.png" alt="3D Reconstruction" width="700">
 </div>
 
-## 📜 License
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ## 📧 Contact
 For inquiries, feel free to contact:  
