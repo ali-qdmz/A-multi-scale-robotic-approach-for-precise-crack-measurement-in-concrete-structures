@@ -75,13 +75,27 @@ The simulation environment should look as below:
 
 ## 📂 Repository Structure
 ```yaml
-├── ros_package/       # ROS package for robotic crack inspection
-├── cnn_model/         # CNN model for crack detection
-├── data/              # Experimental and simulation datasets
-├── results/           # Analysis and output visualizations
-├── docs/              # Documentation and supplementary files
-├── README.md          # Main project documentation
-└── LICENSE            # License information
+├── jackal_velodyne/      # Jackal ROS package for mobility
+├── realsense-ros/        # Intel RealSense camera drivers
+├── universal_robot/      # Universal Robot ROS package
+├── ros_package/          # ROS package for robotic crack inspection
+├── cnn_model/            # CNN model for crack detection
+├── data/                 # Experimental and simulation datasets
+├── results/              # Analysis and output visualizations
+│   ├── 3D_reconstruction.png  # 3D point cloud reconstruction
+│   ├── crack_res.png          # Crack detection results
+│   ├── crack_sim.png          # Crack simulation image
+│   ├── experimental_setup.png # Experiment setup diagram
+│   ├── simulation_setup.jpg   # Simulation setup visualization
+├── scripts/              # Utility scripts
+│   ├── move_it.py        # Script for UR3 robotic movement
+│   ├── ur3_control.py    # UR3 robotic arm control script
+│   ├── ros_unet.py       # Crack detection using CNN model
+│   ├── script.sh         # Bash script for automation
+├── .rosinstall           # ROS workspace installation dependencies
+├── CMakeLists.txt        # ROS build system file
+├── README.md             # Main project documentation
+├── LICENSE               # License information
 ```
 
 ## 📊 Results and Visualizations
