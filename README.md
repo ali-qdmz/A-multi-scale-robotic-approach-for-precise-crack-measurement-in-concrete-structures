@@ -2,13 +2,13 @@
 
 [![Paper DOI](https://img.shields.io/badge/DOI-10.1016/j.autcon.2023.105215-blue)](https://doi.org/10.1016/j.autcon.2023.105215)
 
-## 📖 Overview
+## 💑 Publication
 This repository contains the source code and datasets for the **Multi-Scale Robotic Crack Measurement** approach introduced in the paper:
+- 📝 **Title:** A Multi-Scale Robotic Approach for Precise Crack Measurement in Concrete Structures
+- 📚 **Journal:** Automation in Construction (2024)
+- 🔗 **[Read the Full Paper](https://doi.org/10.1016/j.autcon.2023.105215)**
 
-> **A Multi-Scale Robotic Approach for Precise Crack Measurement in Concrete Structures**  
-> *Ali Ghadimzadeh Alamdari, Arvin Ebrahimkhanlou*  
-> Published in *Automation in Construction (2024)*  
-> [🔗 Read the Paper](https://doi.org/10.1016/j.autcon.2023.105215)
+---
 
 The repository provides:
 - **ROS Package** for controlling a robotic arm for crack inspection.
