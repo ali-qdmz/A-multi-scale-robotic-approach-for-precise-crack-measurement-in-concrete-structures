@@ -16,6 +16,8 @@ The repository provides:
 - **CNN Model** for detecting and segmenting cracks using computer vision.
 - **Experimental Data** including LiDAR scans, images, and point clouds.
 - **Analysis Scripts** for evaluating performance and generating visualizations.
+- **Uses the Universal Robot package as part of its structure.**
+- **Includes parts of the Jackal package for enhanced mobility and navigation.**
 
 ## 🚀 Getting Started
 
