@@ -104,8 +104,6 @@ The simulation environment should look as below:
     <img src="crack_sim.png" alt="Crack Detection Example" width="700">
 </div>
 
-
-
 ### 📌 Real World Crack Detection Output
 
 <div align="center">
@@ -122,6 +120,16 @@ The simulation environment should look as below:
     <img src="3D_reconstruction.png" alt="3D Reconstruction" width="700">
 </div>
 
+## 🎥 Demonstration Video
+
+A demonstration of the robotic crack measurement system can be seen below:
+
+<div align="center">
+    <video width="700" controls>
+        <source src="results/Final" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
 
 ## 📧 Contact
 For inquiries, feel free to contact:  
