@@ -107,5 +107,4 @@ The simulation environment should look as below:
 
 ## 📧 Contact
 For inquiries, feel free to contact:  
-📩 **Ali Ghadimzadeh Alamdari** – [ag4328@drexel.edu](mailto:ag4328@drexel.edu)  
-📩 **Arvin Ebrahimkhanlou** – [ae628@drexel.edu](mailto:ae628@drexel.edu)
+📩 **Ali Ghadimzadeh Alamdari** – [ali.ghadimzadeh@gmail.com](mailto:ali.ghadimzadeh@gmail.com)  
