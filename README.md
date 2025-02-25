@@ -17,41 +17,62 @@ The repository provides:
 - **Experimental Data** including LiDAR scans, images, and point clouds.
 - **Analysis Scripts** for evaluating performance and generating visualizations.
 - **Uses the Universal Robot package as part of its structure.**
-- **Includes parts of the Jackal package for enhanced mobility and navigation.**
+- **Includes parts of the Jackal package for building the structure.**
 
 ## 🚀 Getting Started
+Install required dependencies. We tested on ROS noetic (Ubuntu 20.04.6 LTS)
+```bash
+pip install torchvision
+sudo apt-get install ros-noetic-trac-ik-kinematics-plugin
+sudo apt install ros-noetic-moveit-commander
+sudo apt install ros-noetic-moveit-python
+sudo apt install ros-noetic-moveit
+pip install tqdm
+pip install pandas
+pip install albumentations
+sudo apt-get install ros-noetic-ros-control ros-noetic-ros-controllers
+sudo apt-get install ros-noetic-velodyne-*
+sudo apt-get install ros-noetic-realsense2-camera
+```
+
 
 ### 1️⃣ Clone the Repository
-```bash
-git clone https://github.com/YOUR-USERNAME/A-Multi-Scale-Robotic-Crack-Measurement.git
-cd A-Multi-Scale-Robotic-Crack-Measurement
-```
-
-### 2️⃣ ROS Package Setup
 The **ROS package** is built inside `catkin_ws`. Ensure you have **ROS (Melodic/Noetic)** installed.
-
 ```bash
-cd ros_package
+cd catkin_ws
+cd src
+git clone https://github.com/ali-qdmz/A-multi-scale-robotic-approach-for-precise-crack-measurement-in-concrete-structures
+cd ..
 catkin_make
-source devel/setup.bash
+source devel/setup.sh
 ```
+### 2️⃣ ROS Package Setup
 
 Run the robotic inspection:
 ```bash
-roslaunch crack_inspection robot.launch
+roslaunch ur_gazebo ur3_bringup.launch
 ```
 
 ### 3️⃣ Running the CNN Model
-The crack detection model is based on **U-Net**. To test the model:
+The crack detection model is based on **U-Net**. To test the model and available to download on google drive (likn: https://drive.google.com/file/d/1L4OmKD-teFMR5Y0WEqxjo4qtnxc5zd1P/view?usp=sharing).
+First run ur3_control to move the arm to initial position:
+
 ```bash
-cd cnn_model
-python run_inference.py --image sample.jpg
+python ur3_control.py
 ```
 
-To train the model:
+Then run the model, and visualize the real-time results in Rviz in topic named "model_result_image"
+
 ```bash
-python train.py --dataset dataset/
+python ros_unet.py
 ```
+
+The simulation environment should look as below:
+
+<div align="center">
+    <img src="simulation setup.jpg" alt="Crack Detection Example" width="300">
+</div>
+
 
 ## 📂 Repository Structure
 ```yaml
@@ -66,14 +87,21 @@ python train.py --dataset dataset/
 
 ## 📊 Results and Visualizations
 
-### 📌 Crack Detection Output
+### 📌 Simulation Crack Detection Output
 <div align="center">
-    <img src="results/crack_detection_example.png" alt="Crack Detection Example" width="500">
+    <img src="crack_sim.png" alt="Crack Detection Example" width="700">
 </div>
 
-### 📌 LiDAR-Based 3D Reconstruction
+
+### 📌 Real World Crack Detection Output
 <div align="center">
-    <img src="results/point_cloud_example.png" alt="3D Reconstruction" width="500">
+    <img src="crack_res.png" alt="Crack Detection Example" width="700">
+</div>
+
+
+### 📌 High Resolution Crack 3D Reconstruction and Comparision Between LiDAR, Depth Camera and Laser Scanner
+<div align="center">
+    <img src="3D_reconstruction.png" alt="3D Reconstruction" width="700">
 </div>
 
 ## 📜 License
