@@ -51,7 +51,7 @@ Run the robotic inspection using the bash script provided
 ```
 
 ### 3️⃣ Running the CNN Model
-The crack detection model is based on **U-Net**. To test the model and available to download on google drive (likn: https://drive.google.com/file/d/1L4OmKD-teFMR5Y0WEqxjo4qtnxc5zd1P/view?usp=sharing).
+The crack detection model is based on **U-Net**. To test the model and download it from Google Drive, [click here](https://drive.google.com/file/d/1L4OmKD-teFMR5Y0WEqxjo4qtnxc5zd1P/view?usp=sharing).
 First run ur3_control to move the arm to initial position:
 
 ```bash
